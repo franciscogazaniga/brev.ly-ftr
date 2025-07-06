@@ -55,6 +55,7 @@ export async function createLink(
   await db.insert(schema.links).values({
     originalLink: originalLink,
     shortenedLink: customSlug,
+    accessCount: 0,
   })
 
   const shortenedLink = `https://localhost:3333/${customSlug}`
