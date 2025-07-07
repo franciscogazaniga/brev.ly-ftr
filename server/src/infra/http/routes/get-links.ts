@@ -11,9 +11,9 @@ export const getLinksRoute: FastifyPluginAsyncZod = async server => {
         summary: 'Get links',
         tags: ['get-links'],
         querystring: z.object({
-          searchQuery: z.string().optional(),
-          sortBy: z.enum(['createdAt']).optional(),
-          sortDirection: z.enum(['asc', 'desc']).optional(),
+          searchQuery: z.string().optional().default(''),
+          sortBy: z.enum(['createdAt']).optional().describe('Sort by field'),
+          sortDirection: z.enum(['asc', 'desc']).optional().describe('Sort direction'),
           page: z.coerce.number().optional().default(1),
           pageSize: z.coerce.number().optional().default(20),
         }),

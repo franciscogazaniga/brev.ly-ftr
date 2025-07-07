@@ -13,7 +13,10 @@ export const deleteLinkRoute: FastifyPluginAsyncZod = async server => {
           linkId: z.string().describe('The link id to be deleted.'),
         }).describe('Delete a shortened link.'),
         response: {
-          204: z.undefined().describe('Link deleted successfully'),
+          204: {
+            description: 'Link deleted',
+            type: 'null',
+          },
           404: z.object({ message: z.string() }).describe('Link not found'),
           500: z.object({ message: z.string() }).describe('Unexpected error'),
         },

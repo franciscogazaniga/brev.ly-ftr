@@ -2,7 +2,7 @@ import Image404 from '../../public/404.svg'
 
 export function NotFound() {
   return (
-    <main>
+    <main className="h-dvh flex flex-col gap-y-3 items-center justify-center p-10 bg-gray-200">
       <div className="w-full flex gap-y-5 flex-col items-center justify-center bg-gray-100 p-6 max-w-96 rounded-lg gap-y-6">
         <img src={Image404} alt="Imagem de erro 404" />
 

@@ -5,6 +5,7 @@ import { uploadLinkToStorage } from "../http/upload-link-to-storage";
 import { getLinksFromStorage } from "../http/get-links-from-storage";
 import { toast } from "react-toastify";
 import { deleteLinkFromStorage } from "../http/delete-link-from-storage";
+import { uploadCSVToStorage } from "../http/upload-csv-to-storage";
 
 export type Link = {
   linkId: string
@@ -21,6 +22,7 @@ type LinkState = {
   createLink: (originalLink: string, slug: string) => Promise<void>
   deleteLink: (linkId: string) => void
   incrementAccessCounter: (linkId: string) => void
+  exportLinksToCSV: (searchQuery?: string) => void
 }
 
 enableMapSet() // Enable Map and Set support in immer
@@ -119,6 +121,30 @@ export const useLinks = create<LinkState, [['zustand/immer', never]]>(
           })
         }
       })
+    },
+
+    exportLinksToCSV: async (searchQuery?: string) => {
+      set((state) => {
+        state.isLoading = true
+        state.error = null
+      })
+    
+      try {
+        const reportUrl = await uploadCSVToStorage(searchQuery)
+    
+        toast.success('CSV exportado com sucesso!')
+        window.open(reportUrl, '_blank')
+      } catch (err: any) {
+        console.error(err)
+        set((state) => {
+          state.error = err.message || 'Erro ao exportar links.'
+        })
+        toast.error('Erro ao exportar links.')
+      } finally {
+        set((state) => {
+          state.isLoading = false
+        })
+      }
     }
   }))
 )

@@ -7,6 +7,8 @@ import { useEffect } from "react";
 export function MyLinks() {
   const links = useLinks((state) => state.links)
   const fetchLinks = useLinks((state) => state.fetchLinks)
+  const exportLinksToCSV = useLinks((state) => state.exportLinksToCSV)
+  const { isLoading } = useLinks()
   // const isLoading = useLinks((state) => state.isLoading)
   // const error = useLinks((state) => state.error)
 
@@ -20,7 +22,7 @@ export function MyLinks() {
     <div className="w-full flex gap-y-5 flex-col justify-center bg-gray-100 p-6 max-w-96 rounded-lg">
       <div className="flex flex-row items-center justify-between">
         <h1 className="text-lg-custom">Meus links</h1>
-        <ButtonDownloadCSV icon={<DownloadSimpleIcon size={16} weight="regular" />}>Baixar CSV</ButtonDownloadCSV>
+        <ButtonDownloadCSV onClick={() => exportLinksToCSV()} icon={<DownloadSimpleIcon size={16} weight="regular" />} isLoading={isLoading}>Baixar CSV</ButtonDownloadCSV>
       </div>
 
 

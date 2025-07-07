@@ -20,7 +20,9 @@ export function ShortenedLink({ linkId, shortenedLink, originalLink, accessCount
   return (
     <div className="w-full flex flex-row items-center justify-between py-3 border-t-[1px] border-gray-200">
       <div className="flex flex-col gap-y-1">
-        <Link className="text-md-custom text-blue-base" to={`/${shortenedLink}`}>{shortenedLink}</Link>
+        <Link className="text-md-custom text-blue-base" to={`/${shortenedLink}`}>
+          brev.ly/{shortenedLink}
+        </Link>
         {/* <a className="text-md-custom text-blue-base" href={`http://localhost:5173/${shortenedLink}`} target="_blank" rel="noopener noreferrer">{shortenedLink}</a> */}
         <span className="text-sm-custom text-gray-500">{originalLink}</span>
       </div>
