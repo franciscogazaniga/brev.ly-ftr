@@ -4,6 +4,7 @@ import { ShortenedLink } from "./shortened-link";
 import { useLinks } from "../store/links";
 import { useEffect } from "react";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
+import { LoadingBar } from "./ui/loading-bar";
 
 export function MyLinks() {
   const links = useLinks((state) => state.links)
@@ -31,7 +32,9 @@ export function MyLinks() {
   }, [fetchLinks])
 
   return (
-    <div className="w-full flex gap-y-5 flex-col justify-center md:justify-start bg-gray-100 max-w-96 md:max-w-md md:min-h-96 rounded-lg p-6">
+    <div className="relative w-full flex gap-y-5 flex-col justify-center md:justify-start bg-gray-100 max-w-96 md:max-w-md md:min-h-96 rounded-lg p-6">
+      {isLoadingFetchLinks ? (<LoadingBar />) : <></>}
+
       <div className="flex flex-row items-center justify-between">
         <h1 className="text-lg-custom">Meus links</h1>
         <ButtonDownloadCSV onClick={() => exportLinksToCSV()} icon={<DownloadSimpleIcon size={16} weight="regular" />} isLoading={isLoadingCSV}>Baixar CSV</ButtonDownloadCSV>
