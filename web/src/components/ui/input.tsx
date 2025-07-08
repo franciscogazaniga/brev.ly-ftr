@@ -14,7 +14,7 @@ function InputComponent({ inputHeader, inputPlaceholder, error, ...props }: Inpu
       <input
         id={inputId}
         ref={ref}
-        className={`order-2 peer w-full p-4 border rounded-lg text-md-custom border-gray-300 text-gray-600 focus:outline-none focus:ring-[1.5px]
+        className={`order-2 peer w-full p-4 border rounded-lg text-md-custom border-gray-300 text-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-[1.5px]
           ${inputHeader === 'Link encurtado' ? "pl-[75px]" : ""}
           ${error
             ? "border-danger focus:ring-danger"

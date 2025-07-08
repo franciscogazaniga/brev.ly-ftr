@@ -4,7 +4,7 @@
 - [X]  Deve ser possível deletar um link
 - [X]  Deve ser possível obter a URL original por meio do encurtamento
 - [X]  Deve ser possível listar todas as URL’s cadastradas
-- [ ]  Deve ser possível incrementar a quantidade de acessos de um link
+- [X]  Deve ser possível incrementar a quantidade de acessos de um link
 - [X]  Deve ser possível baixar um CSV com o relatório dos links criados
 
 Além disso, também temos algumas regras importantes específicas para o front-end:
