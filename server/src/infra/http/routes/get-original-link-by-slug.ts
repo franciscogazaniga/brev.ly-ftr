@@ -15,7 +15,7 @@ export const getOriginalLinkBySlug: FastifyPluginAsyncZod = async server => {
           customSlug: z.string(),
         }),
         response: {
-          200: z.object({ originalLink: z.string().url() }),
+          200: z.object({ originalLink: z.string().url(), linkId: z.string() }),
         },
       },
     },
@@ -36,7 +36,7 @@ export const getOriginalLinkBySlug: FastifyPluginAsyncZod = async server => {
       }
 
       console.log("Response from API:", originalLink)
-      return reply.status(200).send({ originalLink })
+      return reply.status(200).send({ originalLink, linkId })
     }
   )
 }

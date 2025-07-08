@@ -8,7 +8,12 @@ interface LinkFromAPI {
 }
 
 export async function getLinksFromStorage() {
-  const response = await axios.get<{ links: LinkFromAPI[] }>("http://localhost:3333/links")
+  const response = await axios.get<{ links: LinkFromAPI[] }>("http://localhost:3333/links", {
+    params: {
+      sortBy: 'createdAt',
+      sortDirection: 'asc',
+    },
+  })
 
   return response.data.links.map((link) => ({
     id: link.id,

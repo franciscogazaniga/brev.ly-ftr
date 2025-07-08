@@ -19,7 +19,7 @@ export const createLinkRoute: FastifyPluginAsyncZod = async server => {
           customSlug: z.string().describe('Custom slug for the shortened link.'),
         }).describe('Create a new shortened link.'),
         response: {
-          201: z.object({ shortenedLink: z.string() }).describe('Shortened Link created.'),
+          201: z.object({ shortenedLink: z.string(), id: z.string() }).describe('Shortened Link created.'),
           400: z.object({ message: z.string() }),
           500: z.object({ message: z.string() }),
         },
@@ -36,7 +36,8 @@ export const createLinkRoute: FastifyPluginAsyncZod = async server => {
       if (isRight(result)) {
         console.log('Link: ', unwrapEither(result))
         const { shortenedLink } = unwrapEither(result)
-        return reply.status(201).send({ shortenedLink })
+        const { id } = unwrapEither(result)
+        return reply.status(201).send({ shortenedLink, id })
       }
 
       const error = unwrapEither(result)

@@ -14,10 +14,10 @@ function InputComponent({ inputHeader, inputPlaceholder, error, ...props }: Inpu
       <input
         id={inputId}
         ref={ref}
-        className={`order-2 peer w-full p-4 border rounded-lg text-md-custom text-gray-600
+        className={`order-2 peer w-full p-4 border rounded-lg text-md-custom border-gray-300 text-gray-600 focus:outline-none focus:ring-[1.5px]
           ${error
-            ? "border-danger focus:border-danger"
-            : "border-gray-300 focus:border-blue-base"
+            ? "border-danger focus:ring-danger"
+            : "border-blue-base focus:ring-blue-base"
           }
         `}
         placeholder={inputPlaceholder}

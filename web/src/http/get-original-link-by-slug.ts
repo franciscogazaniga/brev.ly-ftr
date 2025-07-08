@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 interface OriginalLinkResponse {
+  linkId: string
   originalLink: string
 }
 

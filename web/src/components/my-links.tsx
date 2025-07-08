@@ -6,19 +6,32 @@ import { useEffect } from "react";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 
 export function MyLinks() {
+  const links = useLinks((state) => state.links)
   const fetchLinks = useLinks((state) => state.fetchLinks)
   const exportLinksToCSV = useLinks((state) => state.exportLinksToCSV)
-  const { isLoadingFetchLinks, isLoadingCSV, links } = useLinks()
+  const isLoadingCSV = useLinks((state) => state.isLoadingCSV)
+  const isLoadingFetchLinks = useLinks((state) => state.isLoadingFetchLinks)
   const isLinksListEmpty = links.size === 0
+  const { incrementAccessCounter } = useLinks()
 
   useEffect(() => {
     fetchLinks()
+    const bc = new BroadcastChannel("link-accessed")
+
+    bc.onmessage = (event) => { // Communication between sheets
+      if (event.data?.type === "link-accessed") {
+        const { linkId } = event.data
+        incrementAccessCounter(linkId)
+      }
+    }
+
+    return () => {
+      bc.close() // limpa canal ao desmontar
+    }
   }, [fetchLinks])
 
-  const linkList = Array.from(links.values())
-
   return (
-    <div className="w-full flex gap-y-5 flex-col justify-center md:justify-start bg-gray-100 p-6 max-w-96 md:max-w-md md:min-h-96 rounded-lg p-6">
+    <div className="w-full flex gap-y-5 flex-col justify-center md:justify-start bg-gray-100 max-w-96 md:max-w-md md:min-h-96 rounded-lg p-6">
       <div className="flex flex-row items-center justify-between">
         <h1 className="text-lg-custom">Meus links</h1>
         <ButtonDownloadCSV onClick={() => exportLinksToCSV()} icon={<DownloadSimpleIcon size={16} weight="regular" />} isLoading={isLoadingCSV}>Baixar CSV</ButtonDownloadCSV>
@@ -35,25 +48,18 @@ export function MyLinks() {
           <span className="text-xs-custom">Ainda não existem links cadastrados</span>
         </div>
       ) : (
-        <ScrollArea.Root type="scroll" className="h-[200px] w-full overflow-hidden rounded-lg">
-          <ScrollArea.Viewport className="h-full w-full">
-            {linkList.map(({ shortenedLink, originalLink, accessCounter, linkId }) => (
-              <ShortenedLink
-                key={linkId}
-                linkId={linkId}
-                shortenedLink={shortenedLink}
-                originalLink={originalLink}
-                accessCounter={accessCounter}
-              />
-            ))
-            }
+        <ScrollArea.Root type="scroll" className="h-[200px] md:h-96 w-full overflow-hidden">
+          <ScrollArea.Viewport className="h-full w-full pr-4">
+            {Array.from(links.entries()).reverse().map(([linkId, link]) => {
+              return <ShortenedLink key={linkId} linkId={linkId} link={link} />
+            })}
           </ScrollArea.Viewport>
 
           <ScrollArea.Scrollbar
-            className="flex select-none touch-none bg-blue-base p-0.5 transition-colors duration-[160ms] ease-out data-[orientation=horizontal]:h-2.5 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col"
+            className="flex select-none touch-none bg-gray-200 p-0.5 transition-colors duration-[160ms] ease-out data-[orientation=horizontal]:h-2.5 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col"
             orientation="vertical"
           >
-            <ScrollArea.Thumb className="relative flex-1 bg-blue-dark rounded-[10px] before:absolute before:left-1/2 before:top-1/2 before:size-full before:min-h-11 before:min-w-11 before:-translate-x-1/2 before:-translate-y-1/2" />
+            <ScrollArea.Thumb className="relative flex-1 bg-blue-base rounded-[10px] before:absolute before:left-1/2 before:top-1/2 before:size-full before:min-h-11 before:min-w-11 before:-translate-x-1/2 before:-translate-y-1/2" />
           </ScrollArea.Scrollbar>
         </ScrollArea.Root>
       )}

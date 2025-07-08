@@ -6,6 +6,7 @@ import { schema } from '@/infra/db/schemas'
 import { SlugAlreadyExists } from './errors/slug-already-exists'
 import { InvalidSlugFormat } from './errors/invalid-slug-format'
 import { GenericErrorInvalidInput } from './errors/generic-error-invalid-input'
+import { LinkNotFound } from './errors/link-not-found'
 
 const createLinkInput = z.object({
   originalLink: z.string().url(),
@@ -19,7 +20,7 @@ type CreateLinkInput = z.input<typeof createLinkInput>
 
 export async function createLink(
   input: CreateLinkInput
-): Promise<Either<InvalidLinkFormat | InvalidSlugFormat | GenericErrorInvalidInput | SlugAlreadyExists, { shortenedLink: string }>> {
+): Promise<Either<InvalidLinkFormat | InvalidSlugFormat | GenericErrorInvalidInput | SlugAlreadyExists, { shortenedLink: string, id: string }>> {
   const result = createLinkInput.safeParse(input)
 
   if (!result.success) {
@@ -58,7 +59,16 @@ export async function createLink(
     accessCount: 0,
   })
 
+  const newLink = await db.query.links.findFirst({
+    where: (links, { eq }) => eq(links.shortenedLink, customSlug),
+  })
+
+  if (!newLink) {
+    // fallback de segurança
+    return makeLeft(new LinkNotFound())
+  }
+
   const shortenedLink = `https://localhost:3333/${customSlug}`
 
-  return makeRight({ shortenedLink })
+  return makeRight({ shortenedLink, id: newLink.id })
 }

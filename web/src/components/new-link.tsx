@@ -22,8 +22,11 @@ export function NewLink() {
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<FormData>({ resolver: zodResolver(inputSchema), })
 
   async function handleCreateLink(data: { originalLink: string; customSlug: string }) {
-    await createLink(data.originalLink, data.customSlug)
-    reset()
+    const createdSuccess = await createLink(data.originalLink, data.customSlug)
+
+    if (createdSuccess) {
+      reset()
+    }
   }
 
   return (
@@ -50,7 +53,7 @@ export function NewLink() {
             type="text"
             inputHeader="Link encurtado"
             inputPlaceholder="breav.ly/"
-            error={errors.originalLink?.message}
+            error={errors.customSlug?.message}
             {...register('customSlug')}
           />
           {errors.customSlug && (

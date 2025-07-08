@@ -3,12 +3,11 @@ import { enableMapSet } from "immer";
 import { immer } from "zustand/middleware/immer";
 import { uploadLinkToStorage } from "../http/upload-link-to-storage";
 import { getLinksFromStorage } from "../http/get-links-from-storage";
-import { toast } from "react-toastify";
 import { deleteLinkFromStorage } from "../http/delete-link-from-storage";
 import { uploadCSVToStorage } from "../http/upload-csv-to-storage";
 import { copyLinkToClipboard } from "../http/copy-link-to-clipboard";
 
-export type Link = {
+export type LinkProps = {
   linkId: string
   originalLink: string
   shortenedLink: string
@@ -16,14 +15,14 @@ export type Link = {
 }
 
 type LinkState = {
-  links: Map<string, Link>
+  links: Map<string, LinkProps>
   isLoadingFetchLinks: boolean
   isLoadingCSV: boolean
   isLoadingLinkCreation: boolean
   error: string | null
   fieldErrors: Record<string, string>
   fetchLinks: () => Promise<void>
-  createLink: (originalLink: string, slug: string) => Promise<void>
+  createLink: (originalLink: string, slug: string) => Promise<boolean>
   deleteLink: (linkId: string, customSlug: string) => void
   copyLink: (shortenedLink: string) => void
   incrementAccessCounter: (linkId: string) => void
@@ -91,6 +90,8 @@ export const useLinks = create<LinkState, [['zustand/immer', never]]>(
             accessCounter: 0,
           })
         })
+
+        return true
       } catch (err: any) {
         const message = err.response?.data?.message || 'Erro ao criar link'
         const errors = err.response?.data?.errors || []
@@ -104,7 +105,13 @@ export const useLinks = create<LinkState, [['zustand/immer', never]]>(
           })
         })
 
-        toast.error(message)
+        ;(window as any).showToast?.({
+          title: "Erro no cadastro",
+          description: message,
+          type: "error"
+        })
+
+        return false
       } finally {
         set((state) => {
           state.isLoadingLinkCreation = false
@@ -123,7 +130,11 @@ export const useLinks = create<LinkState, [['zustand/immer', never]]>(
           state.links.delete(linkId) 
         })
       } catch (error) {
-        console.error("Erro ao deletar link:", error)
+        ;(window as any).showToast?.({
+          title: "Link não foi deletado",
+          description: "Erro ao deletar link: ", error,
+          type: "error"
+        })
       }
     },
 
@@ -131,9 +142,17 @@ export const useLinks = create<LinkState, [['zustand/immer', never]]>(
       try {
         const successMessage = await copyLinkToClipboard(shortenedLink) 
     
-        toast.info(successMessage)
+        ;(window as any).showToast?.({
+          title: "Link copiado com sucesso",
+          description: successMessage,
+          type: "info"
+        })
       } catch (error) {
-        toast.error("Erro ao deletar link.")
+        ;(window as any).showToast?.({
+          title: "Link não foi copiado",
+          description: "Erro ao copiar link",
+          type: "error"
+        })
       }
     },
 
@@ -157,14 +176,18 @@ export const useLinks = create<LinkState, [['zustand/immer', never]]>(
     
       try {
         await uploadCSVToStorage(searchQuery)
-        // const reportUrl = await uploadCSVToStorage(searchQuery)
-        // window.open(reportUrl, '_blank')
+        const reportUrl = await uploadCSVToStorage(searchQuery)
+        window.open(reportUrl)
       } catch (err: any) {
-        console.error(err)
         set((state) => {
           state.error = err.message || 'Erro ao exportar links.'
         })
-        toast.error('Erro ao exportar links.')
+
+        ;(window as any).showToast?.({
+          title: "Erro na exportação",
+          description: "Erro ao exportar links",
+          type: "error"
+        })
       } finally {
         set((state) => {
           state.isLoadingCSV = false
