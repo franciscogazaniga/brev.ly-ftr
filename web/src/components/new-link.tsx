@@ -47,12 +47,15 @@ export function NewLink() {
             <span className="flex flex-row items-center gap-x-2 text-gray-500 text-xs"><span className="text-danger"><WarningDiamondIcon size={14} /></span>{errors.originalLink.message}</span>)}
         </div>
 
-        <div className="flex flex-col gap-y-2">
+        <div className="relative flex flex-col gap-y-2">
+          <span className="absolute text-md-custom left-[17px] top-[48px] -translate-y-1/2 text-gray-400">
+            breav.ly/
+          </span>
+
           <Input
             id="customSlug"
             type="text"
             inputHeader="Link encurtado"
-            inputPlaceholder="breav.ly/"
             error={errors.customSlug?.message}
             {...register('customSlug')}
           />
