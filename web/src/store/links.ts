@@ -6,6 +6,7 @@ import { getLinksFromStorage } from "../http/get-links-from-storage";
 import { toast } from "react-toastify";
 import { deleteLinkFromStorage } from "../http/delete-link-from-storage";
 import { uploadCSVToStorage } from "../http/upload-csv-to-storage";
+import { copyLinkToClipboard } from "../http/copy-link-to-clipboard";
 
 export type Link = {
   linkId: string
@@ -16,11 +17,15 @@ export type Link = {
 
 type LinkState = {
   links: Map<string, Link>
-  isLoading: boolean
+  isLoadingFetchLinks: boolean
+  isLoadingCSV: boolean
+  isLoadingLinkCreation: boolean
   error: string | null
+  fieldErrors: Record<string, string>
   fetchLinks: () => Promise<void>
   createLink: (originalLink: string, slug: string) => Promise<void>
-  deleteLink: (linkId: string) => void
+  deleteLink: (linkId: string, customSlug: string) => void
+  copyLink: (shortenedLink: string) => void
   incrementAccessCounter: (linkId: string) => void
   exportLinksToCSV: (searchQuery?: string) => void
 }
@@ -30,12 +35,15 @@ enableMapSet() // Enable Map and Set support in immer
 export const useLinks = create<LinkState, [['zustand/immer', never]]>(
   immer((set) => ({
     links: new Map(),
-    isLoading: false,
+    isLoadingFetchLinks: false,
+    isLoadingCSV: false,
+    isLoadingLinkCreation: false,
     error: null,
+    fieldErrors: {},
 
     fetchLinks: async () => {
       set((state) => {
-        state.isLoading = true
+        state.isLoadingFetchLinks = true
         state.error = null
       })
     
@@ -61,14 +69,14 @@ export const useLinks = create<LinkState, [['zustand/immer', never]]>(
         })
       } finally {
         set((state) => {
-          state.isLoading = false
+          state.isLoadingFetchLinks = false
         })
       }
     },
 
     createLink: async (originalLink: string, customSlug: string) => {
       set((state) => {
-        state.isLoading = true
+        state.isLoadingLinkCreation = true
         state.error = null
       })
 
@@ -85,29 +93,47 @@ export const useLinks = create<LinkState, [['zustand/immer', never]]>(
         })
       } catch (err: any) {
         const message = err.response?.data?.message || 'Erro ao criar link'
+        const errors = err.response?.data?.errors || []
 
         set((state) => {
           state.error = message
+          state.fieldErrors = {}
+
+          errors.forEach((e: { field: string, message: string }) => {
+            state.fieldErrors[e.field] = e.message
+          })
         })
 
         toast.error(message)
       } finally {
         set((state) => {
-          state.isLoading = false
+          state.isLoadingLinkCreation = false
         })
       }
     },
 
-    deleteLink: async (linkId: string) => {
+    deleteLink: async (linkId: string, customSlug: string) => {
+      const confirmed = window.confirm(`Você realmente quer apagar o link ${customSlug}?`)
+      if (!confirmed) return
+
       try {
-        await deleteLinkFromStorage({ linkId }) // Chamada HTTP
+        await deleteLinkFromStorage({ linkId }) 
     
         set((state) => {
-          state.links.delete(linkId) // Atualiza o estado local
+          state.links.delete(linkId) 
         })
       } catch (error) {
         console.error("Erro ao deletar link:", error)
-        // Aqui você pode adicionar lógica de fallback, exibir toast, etc.
+      }
+    },
+
+    copyLink: async (shortenedLink: string) => {
+      try {
+        const successMessage = await copyLinkToClipboard(shortenedLink) 
+    
+        toast.info(successMessage)
+      } catch (error) {
+        toast.error("Erro ao deletar link.")
       }
     },
 
@@ -125,15 +151,14 @@ export const useLinks = create<LinkState, [['zustand/immer', never]]>(
 
     exportLinksToCSV: async (searchQuery?: string) => {
       set((state) => {
-        state.isLoading = true
+        state.isLoadingCSV = true
         state.error = null
       })
     
       try {
-        const reportUrl = await uploadCSVToStorage(searchQuery)
-    
-        toast.success('CSV exportado com sucesso!')
-        window.open(reportUrl, '_blank')
+        await uploadCSVToStorage(searchQuery)
+        // const reportUrl = await uploadCSVToStorage(searchQuery)
+        // window.open(reportUrl, '_blank')
       } catch (err: any) {
         console.error(err)
         set((state) => {
@@ -142,7 +167,7 @@ export const useLinks = create<LinkState, [['zustand/immer', never]]>(
         toast.error('Erro ao exportar links.')
       } finally {
         set((state) => {
-          state.isLoading = false
+          state.isLoadingCSV = false
         })
       }
     }

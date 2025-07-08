@@ -1,18 +1,43 @@
+import { forwardRef } from "react"
+
 type InputProps = {
   inputHeader: string
   inputPlaceholder: string
+  error?: string
 } & React.InputHTMLAttributes<HTMLInputElement>
 
-export function Input({ inputHeader, inputPlaceholder, ...props }: InputProps) {
+function InputComponent({ inputHeader, inputPlaceholder, error, ...props }: InputProps, ref: React.Ref<HTMLInputElement>) {
+  const inputId = props.id || inputHeader.toLowerCase().replace(/\s+/g, "-")
+
   return (
-    <div className="flex flex-col gap-y-2 focus-within:text-blue-base focus-within:font-bold">
-      <p className="text-xs-custom">{inputHeader}</p>
+    <div className="flex flex-col gap-y-2">
       <input
-        type="text"
-        className="w-full p-4 border border-gray-300 rounded-lg text-md-custom focus:border-blue-base"
+        id={inputId}
+        ref={ref}
+        className={`order-2 peer w-full p-4 border rounded-lg text-md-custom text-gray-600
+          ${error
+            ? "border-danger focus:border-danger"
+            : "border-gray-300 focus:border-blue-base"
+          }
+        `}
         placeholder={inputPlaceholder}
         {...props}
       />
+
+      <label
+        htmlFor={inputId}
+        className={`order-1 text-xs-custom
+            transition-colors
+            ${error ? "text-danger peer-focus:text-danger" : "text-gray-500"}
+            peer-focus:text-blue-base
+          `}>
+        {inputHeader}
+      </label>
     </div>
   )
 }
+
+export const Input = forwardRef(InputComponent)
+
+// Para evitar warnings no React DevTools
+Input.displayName = "Input"

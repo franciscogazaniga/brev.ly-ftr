@@ -1,7 +1,13 @@
 import { createLink } from "@/app/functions/create-link";
+import { GenericErrorInvalidInput } from "@/app/functions/errors/generic-error-invalid-input";
 import { isRight, unwrapEither } from "@/shared/either";
 import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
+
+// Type guard
+function isGenericErrorInvalidInput(error: any): error is GenericErrorInvalidInput {
+  return error?.name === 'InvalidInputFormat' && Array.isArray(error.issues);
+}
 
 export const createLinkRoute: FastifyPluginAsyncZod = async server => {
   server.post('/links', {
@@ -38,6 +44,19 @@ export const createLinkRoute: FastifyPluginAsyncZod = async server => {
       switch (error.constructor.name) {
         case 'InvalidLinkFormat':
           return reply.status(400).send({ message: error.message })
+        case 'SlugAlreadyExists':
+          return reply.status(400).send({ message: error.message })
+        case 'InvalidInputFormat':
+          console.log("Input inválido")
+          if (isGenericErrorInvalidInput(error)) {
+            return reply.status(400).send({
+              message: error.message,
+              errors: error.issues.map(issue => ({
+                field: issue.path[0],
+                message: issue.message,
+              })),
+            })
+          }
         default:
           return reply.status(500).send({ message: 'Unexpected error' })
       }

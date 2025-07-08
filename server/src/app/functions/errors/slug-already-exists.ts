@@ -1,6 +1,6 @@
 export class SlugAlreadyExists extends Error {
   constructor() {
-    super('This slug already exists.')
+    super('Essa URL encurtada já existe.')
     this.name = 'SlugAlreadyExists'
   }
 }

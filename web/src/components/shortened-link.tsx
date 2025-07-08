@@ -11,10 +11,14 @@ interface ShortenedLinkProps {
 }
 
 export function ShortenedLink({ linkId, shortenedLink, originalLink, accessCounter }: ShortenedLinkProps) {
-  const { deleteLink } = useLinks()
+  const { deleteLink, copyLink } = useLinks()
 
-  async function handleDeleteLink({ linkId }: { linkId: string }) {
-    await deleteLink(linkId)
+  async function handleDeleteLink({ linkId, shortenedLink }: { linkId: string, shortenedLink: string }) {
+    await deleteLink(linkId, shortenedLink)
+  }
+
+  async function handleCopyLink({ shortenedLink }: { shortenedLink: string }) {
+    await copyLink(shortenedLink)
   }
 
   return (
@@ -32,8 +36,8 @@ export function ShortenedLink({ linkId, shortenedLink, originalLink, accessCount
       </div>
 
       <div className="flex flex-row items-center gap-x-1">
-        <ButtonIcon icon={<CopyIcon size={12} />} />
-        <ButtonIcon icon={<TrashIcon size={12} />} onClick={() => handleDeleteLink({ linkId })} />
+        <ButtonIcon icon={<CopyIcon size={12} />} onClick={() => handleCopyLink({ shortenedLink })} />
+        <ButtonIcon icon={<TrashIcon size={12} />} onClick={() => handleDeleteLink({ linkId, shortenedLink })} />
       </div>
     </div>
   )

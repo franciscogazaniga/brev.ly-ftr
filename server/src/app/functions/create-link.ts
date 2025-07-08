@@ -9,10 +9,9 @@ import { GenericErrorInvalidInput } from './errors/generic-error-invalid-input'
 
 const createLinkInput = z.object({
   originalLink: z.string().url(),
-  customSlug: z.string().min(3)
-  .max(50)
+  customSlug: z.string()
   .regex(/^[a-zA-Z0-9-]+$/, {
-    message: 'A slug só pode conter letras, números e hífens.',
+    message: 'Informe uma url minúscula e sem espaços/caracter especial.',
   }),
 })
 
@@ -26,19 +25,20 @@ export async function createLink(
   if (!result.success) {
     const issues = result.error.issues
     
-    // Verifica qual campo falhou
-    const fieldErrors = issues.map(issue => issue.path[0])
+    return makeLeft(new GenericErrorInvalidInput(issues))
+    // // Verifica qual campo falhou
+    // const fieldErrors = issues.map(issue => issue.path[0])
 
-    if (fieldErrors.includes('originalLink')) {
-      return makeLeft(new InvalidLinkFormat())
-    }
+    // if (fieldErrors.includes('originalLink')) {
+    //   return makeLeft(new InvalidLinkFormat())
+    // }
 
-    if (fieldErrors.includes('customSlug')) {
-      return makeLeft(new InvalidSlugFormat())
-    }
+    // if (fieldErrors.includes('customSlug')) {
+    //   return makeLeft(new InvalidSlugFormat())
+    // }
 
-    // fallback genérico
-    return makeLeft(new GenericErrorInvalidInput())
+    // // fallback genérico
+    // return makeLeft(new GenericErrorInvalidInput())
   }
 
   const { originalLink, customSlug } = result.data

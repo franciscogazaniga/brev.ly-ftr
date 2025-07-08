@@ -13,6 +13,8 @@ export async function uploadLinkToStorage(
     customSlug
   }
 
+  console.log("Enviando...", customSlug, originalLink)
+
   const response = await  axios.post<{ shortenedLink: string, linkId: string }>(
     "http://localhost:3333/links",
     data);
@@ -21,3 +23,9 @@ export async function uploadLinkToStorage(
   console.log("Shortened link created with slug: ", response.data.shortenedLink);
   return { shortenedLink: response.data.shortenedLink, linkId: response.data.linkId };
 }
+
+
+
+
+
+

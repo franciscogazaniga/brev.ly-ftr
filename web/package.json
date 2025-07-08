@@ -12,16 +12,22 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@hookform/resolvers": "^5.1.1",
     "@mui/material": "^7.2.0",
     "@phosphor-icons/react": "^2.1.10",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-scroll-area": "^1.2.9",
     "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.10.0",
     "immer": "^10.1.1",
+    "motion": "^12.23.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-hook-form": "^7.60.0",
     "react-router-dom": "^7.6.3",
     "react-toastify": "^11.0.5",
     "tailwindcss": "^4.1.11",
+    "zod": "^3.25.75",
     "zustand": "^5.0.6"
   },
   "devDependencies": {
