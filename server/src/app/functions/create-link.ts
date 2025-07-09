@@ -26,20 +26,20 @@ export async function createLink(
   if (!result.success) {
     const issues = result.error.issues
     
-    return makeLeft(new GenericErrorInvalidInput(issues))
-    // // Verifica qual campo falhou
-    // const fieldErrors = issues.map(issue => issue.path[0])
+    // return makeLeft(new GenericErrorInvalidInput(issues))
+    // Verifica qual campo falhou
+    const fieldErrors = issues.map(issue => issue.path[0])
 
-    // if (fieldErrors.includes('originalLink')) {
-    //   return makeLeft(new InvalidLinkFormat())
-    // }
+    if (fieldErrors.includes('originalLink')) {
+      return makeLeft(new InvalidLinkFormat())
+    }
 
-    // if (fieldErrors.includes('customSlug')) {
-    //   return makeLeft(new InvalidSlugFormat())
-    // }
+    if (fieldErrors.includes('customSlug')) {
+      return makeLeft(new InvalidSlugFormat())
+    }
 
-    // // fallback genérico
-    // return makeLeft(new GenericErrorInvalidInput())
+    // fallback genérico
+    return makeLeft(new GenericErrorInvalidInput())
   }
 
   const { originalLink, customSlug } = result.data

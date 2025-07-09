@@ -1,5 +1,4 @@
 import Image404 from '../../public/404.svg'
-import Logo_Icon from '../../public/Logo_Icon.svg'
 
 export function NotFound() {
   return (
